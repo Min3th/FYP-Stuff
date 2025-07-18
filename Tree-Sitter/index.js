@@ -19,17 +19,24 @@ function extractFunctionData(node, comments) {
 
   const annotations = [];
   const endpoints = [];
+  const auth = [];
   let serviceName = "UnknownService";
 
   for (const comment of comments) {
     if (comment.endIndex < startIndex) {
       const text = comment.text.trim().replace(/^\/\//, "").trim();
-      annotations.push(text);
+
+      if (text.startsWith("@")) {
+        annotations.push(text);
+      }
       if (text.startsWith("@service")) {
         serviceName = text.split(" ")[1];
       }
       if (text.startsWith("@route")) {
         endpoints.push(text.split(" ")[1] || "No route specified");
+      }
+      if (text.startsWith("@auth")) {
+        auth.push(text.split(" ")[1] || "No auth specified");
       }
     }
   }
@@ -41,6 +48,7 @@ function extractFunctionData(node, comments) {
       annotations,
       code: codeSnippet.replace(/\n\s*/g, "").trim(),
       endpoints,
+      auth,
     },
   };
 }
@@ -56,3 +64,5 @@ rootNode.children.forEach((node) => {
 });
 
 console.log(JSON.stringify(services, null, 2));
+
+// have to fix , since two functions of same service still doesnt fall under same service here.
