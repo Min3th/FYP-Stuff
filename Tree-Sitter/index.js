@@ -17,19 +17,19 @@ function extractFunctionData(node, comments) {
   const startIndex = node.startIndex;
   const codeSnippet = code.slice(node.startIndex, node.endIndex);
 
-  const annontations = [];
+  const annotations = [];
   const endpoints = [];
   let serviceName = "UnknownService";
 
   for (const comment of comments) {
     if (comment.endIndex < startIndex) {
       const text = comment.text.trim().replace(/^\/\//, "").trim();
-      annontations.push(`@${text}`);
-      if (text.startsWith("@service:")) {
-        serviceName = text.split("")[1];
+      annotations.push(text);
+      if (text.startsWith("@service")) {
+        serviceName = text.split(" ")[1];
       }
       if (text.startsWith("@route")) {
-        endpoints.push(text.split("")[1]);
+        endpoints.push(text.split(" ")[1] || "No route specified");
       }
     }
   }
@@ -38,7 +38,7 @@ function extractFunctionData(node, comments) {
     serviceName,
     funcName,
     funcData: {
-      annontations,
+      annotations,
       code: codeSnippet.replace(/\n\s*/g, "").trim(),
       endpoints,
     },
